@@ -66,10 +66,12 @@ window.addEventListener("mousemove", (e)=>{
 // 💥 CLICK EXPLOSION & TRANSITION
 let explosion = 0;
 let sceneTimer = 0;
+let transitioned = false;
 
 window.addEventListener("click", ()=>{
   explosion = 1;
   sceneTimer = scenes[currentScene].duration;
+  transitioned = false;
 });
 
 // decay explosion
@@ -82,8 +84,9 @@ function updateExplosion(){
 function updateScene(){
   if(sceneTimer > 0){
     sceneTimer--;
-  } else if(explosion < 0.01 && sceneTimer === 0){
-    // Auto-advance when explosion ends and timer is done
+  } else if(sceneTimer === 0 && !transitioned){
+    // Auto-advance when timer runs out
+    transitioned = true;
     currentScene = (currentScene + 1) % scenes.length;
     console.log("Scene changed to:", scenes[currentScene].name);
   }
