@@ -1,6 +1,13 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+// 🎬 SCENE MANAGEMENT
+let currentScene = 0;
+const scenes = [
+  { name: "Explosion", duration: 180 }, // 3 seconds
+  { name: "Next Part", duration: 300 }
+];
+
 function resize(){
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -56,17 +63,30 @@ window.addEventListener("mousemove", (e)=>{
   targetX = (e.clientY - innerHeight/2) * 0.002;
 });
 
-// 💥 CLICK EXPLOSION
+// 💥 CLICK EXPLOSION & TRANSITION
 let explosion = 0;
+let sceneTimer = 0;
 
 window.addEventListener("click", ()=>{
   explosion = 1;
+  sceneTimer = scenes[currentScene].duration;
 });
 
 // decay explosion
 function updateExplosion(){
   explosion *= 0.92;
   if(explosion < 0.01) explosion = 0;
+}
+
+// Advance to next scene
+function updateScene(){
+  if(sceneTimer > 0){
+    sceneTimer--;
+  } else if(explosion === 0 && sceneTimer === 0){
+    // Auto-advance when explosion ends
+    currentScene = (currentScene + 1) % scenes.length;
+    console.log("Scene changed to:", scenes[currentScene].name);
+  }
 }
 
 // 🧠 ROTATION FUNCTION
@@ -92,6 +112,7 @@ function draw(){
   requestAnimationFrame(draw);
 
   updateExplosion();
+  updateScene();
 
   rotX += (targetX - rotX) * 0.05;
   rotY += (targetY - rotY) * 0.05;
@@ -136,5 +157,10 @@ function draw(){
     ctx.fillStyle = `rgba(255,255,255,${explosion * 0.15})`;
     ctx.fillRect(0,0,canvas.width,canvas.height);
   }
+  
+  // 🎬 DISPLAY CURRENT SCENE
+  ctx.fillStyle = "white";
+  ctx.font = "20px Arial";
+  ctx.fillText(`Scene: ${scenes[currentScene].name}`, 20, 30);
 }
 draw();
