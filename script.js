@@ -68,10 +68,12 @@ window.addEventListener("mousemove", (e)=>{
 // 💥 CLICK EXPLOSION & TRANSITION
 let explosion = 0;
 let sceneTimer = 0;
+let hasTransitioned = false; // KEY FIX: Track if we already transitioned
 
 window.addEventListener("click", ()=>{
   explosion = 1;
   sceneTimer = scenes[currentScene].duration;
+  hasTransitioned = false; // Reset for next transition
   console.log("🔥 CLICK! Timer set to:", sceneTimer, "Scene:", currentScene);
 });
 
@@ -87,8 +89,9 @@ function updateScene(){
     sceneTimer--;
   }
   
-  // When timer reaches exactly 0 AND explosion is gone, advance
-  if(sceneTimer === 0 && explosion === 0 && currentScene !== (currentScene + 1) % scenes.length){
+  // Only transition ONCE when timer hits 0 and explosion is gone
+  if(sceneTimer === 0 && explosion === 0 && !hasTransitioned){
+    hasTransitioned = true; // PREVENT THIS FROM RUNNING AGAIN
     const oldScene = currentScene;
     currentScene = (currentScene + 1) % scenes.length;
     console.log("✅✅✅ SCENE CHANGED FROM", oldScene, "TO", currentScene, "Name:", scenes[currentScene].name);
@@ -189,7 +192,7 @@ function draw(){
   ctx.fillText(`Index: ${currentScene}`, 20, 80);
   ctx.fillText(`Timer: ${sceneTimer}`, 20, 100);
   ctx.fillText(`Explosion: ${explosion.toFixed(3)}`, 20, 120);
-  ctx.fillText(`Frames: ${frameCount}`, 20, 140);
+  ctx.fillText(`Transitioned: ${hasTransitioned}`, 20, 140);
 }
 draw();
 console.log("🎮 Draw loop started!");
