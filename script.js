@@ -66,12 +66,11 @@ window.addEventListener("mousemove", (e)=>{
 // 💥 CLICK EXPLOSION & TRANSITION
 let explosion = 0;
 let sceneTimer = 0;
-let transitioned = false;
 
 window.addEventListener("click", ()=>{
   explosion = 1;
   sceneTimer = scenes[currentScene].duration;
-  transitioned = false;
+  console.log("Click! Starting scene timer:", scenes[currentScene].duration);
 });
 
 // decay explosion
@@ -84,11 +83,12 @@ function updateExplosion(){
 function updateScene(){
   if(sceneTimer > 0){
     sceneTimer--;
-  } else if(sceneTimer === 0 && !transitioned){
-    // Auto-advance when timer runs out
-    transitioned = true;
+  }
+  
+  // When timer reaches exactly 0, advance scene
+  if(sceneTimer === 0 && explosion === 0){
     currentScene = (currentScene + 1) % scenes.length;
-    console.log("Scene changed to:", scenes[currentScene].name);
+    console.log("✅ Scene advanced to:", scenes[currentScene].name, "Current scene index:", currentScene);
   }
 }
 
@@ -123,6 +123,17 @@ function draw(){
   // motion blur
   ctx.fillStyle = "rgba(0,0,0,0.25)";
   ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // Scene-specific background tint
+  if(currentScene === 0){
+    // Explosion scene - warm red tint
+    ctx.fillStyle = "rgba(255,50,50,0.05)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+  } else if(currentScene === 1){
+    // Next Part scene - cool blue tint
+    ctx.fillStyle = "rgba(50,100,255,0.05)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+  }
 
   // 🌠 STAR FIELD
   for(let s of stars){
@@ -164,6 +175,8 @@ function draw(){
   // 🎬 DISPLAY CURRENT SCENE
   ctx.fillStyle = "white";
   ctx.font = "20px Arial";
-  ctx.fillText(`Scene: ${scenes[currentScene].name}`, 20, 30);
+  ctx.fillText(`Scene: ${scenes[currentScene].name} (${currentScene})`, 20, 30);
+  ctx.fillText(`Timer: ${sceneTimer}`, 20, 60);
+  ctx.fillText(`Explosion: ${explosion.toFixed(2)}`, 20, 90);
 }
 draw();
