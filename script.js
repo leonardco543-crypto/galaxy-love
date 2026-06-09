@@ -82,8 +82,8 @@ function updateExplosion(){
 function updateScene(){
   if(sceneTimer > 0){
     sceneTimer--;
-  } else if(explosion === 0 && sceneTimer === 0){
-    // Auto-advance when explosion ends
+  } else if(explosion < 0.01 && sceneTimer === 0){
+    // Auto-advance when explosion ends and timer is done
     currentScene = (currentScene + 1) % scenes.length;
     console.log("Scene changed to:", scenes[currentScene].name);
   }
