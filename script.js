@@ -8,6 +8,8 @@ const scenes = [
   { name: "Next Part", duration: 300 }
 ];
 
+console.log("🎬 Script loaded! Scenes:", scenes);
+
 function resize(){
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -70,7 +72,7 @@ let sceneTimer = 0;
 window.addEventListener("click", ()=>{
   explosion = 1;
   sceneTimer = scenes[currentScene].duration;
-  console.log("Click! Starting scene timer:", scenes[currentScene].duration);
+  console.log("🔥 CLICK! Timer set to:", sceneTimer, "Scene:", currentScene);
 });
 
 // decay explosion
@@ -85,10 +87,11 @@ function updateScene(){
     sceneTimer--;
   }
   
-  // When timer reaches exactly 0, advance scene
-  if(sceneTimer === 0 && explosion === 0){
+  // When timer reaches exactly 0 AND explosion is gone, advance
+  if(sceneTimer === 0 && explosion === 0 && currentScene !== (currentScene + 1) % scenes.length){
+    const oldScene = currentScene;
     currentScene = (currentScene + 1) % scenes.length;
-    console.log("✅ Scene advanced to:", scenes[currentScene].name, "Current scene index:", currentScene);
+    console.log("✅✅✅ SCENE CHANGED FROM", oldScene, "TO", currentScene, "Name:", scenes[currentScene].name);
   }
 }
 
@@ -110,9 +113,13 @@ function rotate(x,y,z){
   return {x:rx,y:dy,z:rz};
 }
 
+// Debug frame counter
+let frameCount = 0;
+
 // 🌌 RENDER LOOP
 function draw(){
   requestAnimationFrame(draw);
+  frameCount++;
 
   updateExplosion();
   updateScene();
@@ -124,14 +131,14 @@ function draw(){
   ctx.fillStyle = "rgba(0,0,0,0.25)";
   ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  // Scene-specific background tint
+  // MASSIVE scene-specific background difference
   if(currentScene === 0){
-    // Explosion scene - warm red tint
-    ctx.fillStyle = "rgba(255,50,50,0.05)";
+    // Explosion scene - BRIGHT RED
+    ctx.fillStyle = "rgba(255,0,0,0.3)";
     ctx.fillRect(0,0,canvas.width,canvas.height);
   } else if(currentScene === 1){
-    // Next Part scene - cool blue tint
-    ctx.fillStyle = "rgba(50,100,255,0.05)";
+    // Next Part scene - BRIGHT BLUE
+    ctx.fillStyle = "rgba(0,0,255,0.3)";
     ctx.fillRect(0,0,canvas.width,canvas.height);
   }
 
@@ -172,11 +179,17 @@ function draw(){
     ctx.fillRect(0,0,canvas.width,canvas.height);
   }
   
-  // 🎬 DISPLAY CURRENT SCENE
+  // 🎬 DISPLAY CURRENT SCENE - MASSIVE TEXT
+  ctx.fillStyle = currentScene === 0 ? "rgba(255,100,100,1)" : "rgba(100,150,255,1)";
+  ctx.font = "bold 40px Arial";
+  ctx.fillText(`SCENE: ${scenes[currentScene].name}`, 20, 50);
+  
   ctx.fillStyle = "white";
-  ctx.font = "20px Arial";
-  ctx.fillText(`Scene: ${scenes[currentScene].name} (${currentScene})`, 20, 30);
-  ctx.fillText(`Timer: ${sceneTimer}`, 20, 60);
-  ctx.fillText(`Explosion: ${explosion.toFixed(2)}`, 20, 90);
+  ctx.font = "16px Arial";
+  ctx.fillText(`Index: ${currentScene}`, 20, 80);
+  ctx.fillText(`Timer: ${sceneTimer}`, 20, 100);
+  ctx.fillText(`Explosion: ${explosion.toFixed(3)}`, 20, 120);
+  ctx.fillText(`Frames: ${frameCount}`, 20, 140);
 }
 draw();
+console.log("🎮 Draw loop started!");
